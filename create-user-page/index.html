@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>สร้างชื่อผู้ใช้</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            padding: 20px;
+        }
+        .status-active {
+            color: green;
+            font-weight: bold;
+        }
+        .status-expired {
+            color: red;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        input, button {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .delete-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <h2>สร้างชื่อผู้ใช้ใหม่</h2>
+    
+    <div>
+        <div class="form-group">
+            <label>ชื่อผู้ใช้ใหม่:</label>
+            <input type="text" id="newUsername">
+        </div>
+        <div class="form-group">
+            <label>รหัสผ่านใหม่:</label>
+            <input type="password" id="newPassword">
+        </div>
+        <div class="form-group">
+            <label>รหัสความปลอดภัยใหม่:</label>
+            <input type="text" id="newSecurityCode">
+        </div>
+        <div class="form-group">
+            <label>วันหมดอายุ (ปี-เดือน-วัน):</label>
+            <input type="date" id="expiryDate">
+        </div>
+        <button onclick="createNewUser()">สร้างผู้ใช้</button>
+    </div>
+
+    <h3>รายชื่อสมาชิก</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ชื่อผู้ใช้</th>
+                <th>วันหมดอายุ</th>
+                <th>สถานะ</th>
+                <th>ลบ</th>
+            </tr>
+        </thead>
+        <tbody id="userTable"></tbody>
+    </table>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+
+        function createNewUser() {
+            const newUsername = document.getElementById("newUsername").value.trim();
+            const newPassword = document.getElementById("newPassword").value.trim();
+            const newSecurityCode = document.getElementById("newSecurityCode").value.trim();
+            const expiryDate = document.getElementById("expiryDate").value;
+
+            if (!newUsername || !newPassword || !newSecurityCode || !expiryDate) {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+                return;
+            }
+
+            const user = {
+                username: newUsername,
+                password: newPassword,
+                securityCode: newSecurityCode,
+                expiryDate: expiryDate
+            };
+
+            users.push(user);
+            localStorage.setItem("users", JSON.stringify(users));
+            alert("สร้างผู้ใช้สำเร็จ");
+            renderUsers();
+
+            document.getElementById("newUsername").value = "";
+            document.getElementById("newPassword").value = "";
+            document.getElementById("newSecurityCode").value = "";
+            document.getElementById("expiryDate").value = "";
+        }
+
+        function deleteUser(index) {
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบสมาชิกนี้?")) {
+                users.splice(index, 1);
+                localStorage.setItem("users", JSON.stringify(users));
+                renderUsers();
+            }
+        }
+
+        function renderUsers() {
+            const table = document.getElementById("userTable");
+            table.innerHTML = "";
+
+            const now = new Date().toISOString().split('T')[0];
+
+            users.forEach((user, index) => {
+                const row = document.createElement("tr");
+
+                const nameCell = document.createElement("td");
+                nameCell.textContent = user.username;
+
+                const expiryCell = document.createElement("td");
+                expiryCell.textContent = user.expiryDate;
+
+                const statusCell = document.createElement("td");
+                if (user.expiryDate >= now) {
+                    statusCell.textContent = "ใช้งานได้";
+                    statusCell.classList.add("status-active");
+                } else {
+                    statusCell.textContent = "หมดอายุ";
+                    statusCell.classList.add("status-expired");
+                }
+
+                const deleteCell = document.createElement("td");
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "ลบ";
+                deleteBtn.className = "delete-btn";
+                deleteBtn.onclick = () => deleteUser(index);
+                deleteCell.appendChild(deleteBtn);
+
+                row.appendChild(nameCell);
+                row.appendChild(expiryCell);
+                row.appendChild(statusCell);
+                row.appendChild(deleteCell);
+
+                table.appendChild(row);
+            });
+        }
+
+        renderUsers();
+    </script>
+</body>
+</html>
+
