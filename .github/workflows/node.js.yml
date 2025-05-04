@@ -13,13 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    
+    container: node:22
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.x'
-        cache: 'npm'
     - run: npm install
     - run: npm start
