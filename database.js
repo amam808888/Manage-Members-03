@@ -78,8 +78,21 @@ const getMembers = async () => {
     }
 }
 
+const getMember = async (query) => {
+    try {
+        await client.connect();
+        const result = await members.findOne(query)
+        return result
+    } catch (e) {
+        console.warn(e)
+    } finally {
+        await client.close()
+    }
+}
+
 module.exports = {
     insertMember,
     deleteMember,
-    getMembers
+    getMembers,
+    getMember
 }

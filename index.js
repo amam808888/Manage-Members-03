@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 5000
 const fs = require('fs');
 const cors = require('cors')
 const database = require('./database')
@@ -43,4 +43,9 @@ app.get('/getMembers', async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
     const members = await database.getMembers()
     res.json(members)
+})
+
+app.post('/login', jsonParser, async (req, res) => {
+    const member = await database.getMember(req.body)
+    res.json(member)
 })
