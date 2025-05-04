@@ -1,95 +1,117 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <title>สร้างชื่อผู้ใช้</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-            padding: 20px;
-        }
-        .status-active {
-            color: green;
-            font-weight: bold;
-        }
-        .status-expired {
-            color: red;
-            font-weight: bold;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        input, button {
-            padding: 8px;
-            margin: 5px 0;
-            width: 100%;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .delete-btn {
-            background-color: red;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-        .delete-btn:hover {
-            background-color: darkred;
-        }
-    </style>
-</head>
-<body>
-    <h2>สร้างชื่อผู้ใช้ใหม่</h2>
-    
-    <div>
-        <div class="form-group">
-            <label>ชื่อผู้ใช้ใหม่:</label>
-            <input type="text" id="newUsername">
+    <head>
+        <meta charset="UTF-8">
+        <title>สร้างชื่อผู้ใช้</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f7f7f7;
+                padding: 20px;
+            }
+            .status-active {
+                color: green;
+                font-weight: bold;
+            }
+            .status-expired {
+                color: red;
+                font-weight: bold;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 30px;
+            }
+            th, td {
+                padding: 10px;
+                border: 1px solid #ccc;
+            }
+            th {
+                background-color: #4CAF50;
+                color: white;
+            }
+            input, button {
+                padding: 8px;
+                margin: 5px 0;
+                width: 100%;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            .delete-btn {
+                background-color: red;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                cursor: pointer;
+            }
+            .delete-btn:hover {
+                background-color: darkred;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>สร้างชื่อผู้ใช้ใหม่</h2>
+        
+        <div>
+            <div class="form-group">
+                <label>ชื่อผู้ใช้ใหม่:</label>
+                <input type="text" id="newUsername">
+            </div>
+            <div class="form-group">
+                <label>รหัสผ่านใหม่:</label>
+                <input type="password" id="newPassword">
+            </div>
+            <div class="form-group">
+                <label>รหัสความปลอดภัยใหม่:</label>
+                <input type="text" id="newSecurityCode">
+            </div>
+            <div class="form-group">
+                <label>วันหมดอายุ (ปี-เดือน-วัน):</label>
+                <input type="date" id="expiryDate">
+            </div>
+            <button onclick="createNewUser()">สร้างผู้ใช้</button>
         </div>
-        <div class="form-group">
-            <label>รหัสผ่านใหม่:</label>
-            <input type="password" id="newPassword">
-        </div>
-        <div class="form-group">
-            <label>รหัสความปลอดภัยใหม่:</label>
-            <input type="text" id="newSecurityCode">
-        </div>
-        <div class="form-group">
-            <label>วันหมดอายุ (ปี-เดือน-วัน):</label>
-            <input type="date" id="expiryDate">
-        </div>
-        <button onclick="createNewUser()">สร้างผู้ใช้</button>
-    </div>
 
-    <h3>รายชื่อสมาชิก</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>ชื่อผู้ใช้</th>
-                <th>วันหมดอายุ</th>
-                <th>สถานะ</th>
-                <th>ลบ</th>
-            </tr>
-        </thead>
-        <tbody id="userTable"></tbody>
-    </table>
+        <h3>รายชื่อสมาชิก</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ชื่อผู้ใช้</th>
+                    <th>วันหมดอายุ</th>
+                    <th>สถานะ</th>
+                    <th>ลบ</th>
+                </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
 
+    </body>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-        let users = JSON.parse(localStorage.getItem("users")) || [];
 
-        function createNewUser() {
+        var currentData = []
+
+        const getMembers = async () => {
+            const { data } = await axios.get('/getMembers')
+            currentData = data
+            return data
+        }
+
+        const insertMember = async (body) => {
+            await axios.post('/', body)
+        }
+
+        const deleteMember = async (id) => {
+            await axios.delete(`/${id}`)
+        }
+
+        const checkDuplicateData = async (username) => {
+            return currentData.filter(el => el.username == username).length > 0
+        }
+
+        async function createNewUser() {
             const newUsername = document.getElementById("newUsername").value.trim();
             const newPassword = document.getElementById("newPassword").value.trim();
             const newSecurityCode = document.getElementById("newSecurityCode").value.trim();
@@ -107,30 +129,34 @@
                 expiryDate: expiryDate
             };
 
-            users.push(user);
-            localStorage.setItem("users", JSON.stringify(users));
-            alert("สร้างผู้ใช้สำเร็จ");
-            renderUsers();
-
-            document.getElementById("newUsername").value = "";
-            document.getElementById("newPassword").value = "";
-            document.getElementById("newSecurityCode").value = "";
-            document.getElementById("expiryDate").value = "";
-        }
-
-        function deleteUser(index) {
-            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบสมาชิกนี้?")) {
-                users.splice(index, 1);
-                localStorage.setItem("users", JSON.stringify(users));
-                renderUsers();
+            const isDuplicate = await checkDuplicateData(newUsername)
+            if(isDuplicate) {
+                alert("ชื่อผู้ใช้งานซ้ำ")
+            } else {
+                await insertMember(user)
+                alert("สร้างผู้ใช้สำเร็จ");
+                await renderUsers();
+                document.getElementById("newUsername").value = "";
+                document.getElementById("newPassword").value = "";
+                document.getElementById("newSecurityCode").value = "";
+                document.getElementById("expiryDate").value = "";
             }
         }
 
-        function renderUsers() {
+        async function deleteUser(id) {
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบสมาชิกนี้?")) {
+                await deleteMember(id)
+                await renderUsers();
+            }
+        }
+
+        async function renderUsers() {
             const table = document.getElementById("userTable");
             table.innerHTML = "";
 
             const now = new Date().toISOString().split('T')[0];
+
+            const users = await getMembers()
 
             users.forEach((user, index) => {
                 const row = document.createElement("tr");
@@ -154,7 +180,7 @@
                 const deleteBtn = document.createElement("button");
                 deleteBtn.textContent = "ลบ";
                 deleteBtn.className = "delete-btn";
-                deleteBtn.onclick = () => deleteUser(index);
+                deleteBtn.onclick = () => deleteUser(user._id);
                 deleteCell.appendChild(deleteBtn);
 
                 row.appendChild(nameCell);
@@ -168,6 +194,5 @@
 
         renderUsers();
     </script>
-</body>
-</html>
 
+</html>
