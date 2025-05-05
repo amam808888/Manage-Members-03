@@ -93,20 +93,24 @@
 
         var currentData = []
 
+        // ดึงข้อมูลผู้ใช้งาน
         const getMembers = async () => {
             const { data } = await axios.get('/getMembers')
             currentData = data
             return data
         }
 
+        // เพิ่มข้อมูลผู้ใช้งาน
         const insertMember = async (body) => {
             await axios.post('/', body)
         }
 
+        // ลบข้อมูลผู้ใช้งาน
         const deleteMember = async (id) => {
             await axios.delete(`/${id}`)
         }
 
+        // เช็ค Username ว่าซ้ำกับที่มีอยู่หรือไม่
         const checkDuplicateData = async (username) => {
             return currentData.filter(el => el.username == username).length > 0
         }

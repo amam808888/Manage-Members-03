@@ -29,6 +29,7 @@ run().catch(console.dir);
 const db = client.db('Manage-Member')
 const members = db.collection('members')
 
+// ฟังก์ชั่นเพิ่มข้อมูลผู้ใช้งาน
 const insertMember = async ({ username, password, securityCode, expiryDate }) => {
     try {
         await client.connect();
@@ -47,6 +48,7 @@ const insertMember = async ({ username, password, securityCode, expiryDate }) =>
     }
 }
 
+// ฟังก์ชั่นลบข้อมูลผู้ใช้งาน
 const deleteMember = async (id) => {
     try {
         await client.connect();
@@ -66,6 +68,7 @@ const deleteMember = async (id) => {
     }
 }
 
+// ฟังก์ชั่นดึงข้อมูลผู้ใช้งานทั้งหมด
 const getMembers = async () => {
     try {
         await client.connect();
@@ -78,6 +81,7 @@ const getMembers = async () => {
     }
 }
 
+// ฟังก์ชั่นดึงข้อมูลผู้ใช้งานจากการ Login โดยใช้ Username, Password
 const getMember = async (query) => {
     try {
         await client.connect();
